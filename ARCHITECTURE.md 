@@ -1,0 +1,35 @@
+┌─────────────────────────────────────────────────────────────┐
+│                     AKS Cluster                              │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  Prometheus (scrapes metrics every 15s)              │  │
+│  │  - Node metrics (CPU, memory)                        │  │
+│  │  - Pod metrics (resource usage)                      │  │
+│  │  - Network metrics (latency, bandwidth)              │  │
+│  └────────────────┬─────────────────────────────────────┘  │
+└─────────────────┼──────────────────────────────────────────┘
+                  │
+                  ▼
+        ┌─────────────────────┐
+        │  Metrics Exporter   │
+        │  (Python Service)   │
+        │  - Pulls from       │
+        │    Prometheus       │
+        │  - Sends to ML API  │
+        └────────┬────────────┘
+                 │
+        ┌────────▼──────────────────┐
+        │   ML Anomaly Detector      │
+        │   (FastAPI)                │
+        │   - Receives metrics       │
+        │   - Runs model inference   │
+        │   - Calculates anomaly     │
+        │     score (0-100)          │
+        │   - Stores in InfluxDB     │
+        │   - Triggers alerts        │
+        └────────┬───────────────────┘
+                 │
+        ┌────────▼──────────────┐
+        │  Alert Manager        │
+        │  - PagerDuty/Slack    │
+        │  - Creates incidents  │
+        └──────────────────────┘
